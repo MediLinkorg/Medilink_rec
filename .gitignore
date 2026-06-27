@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+.pytest_cache/
+app/veez_autorec_agent/data/browser_profiles/
+app/autorec_service/data/*.sqlite

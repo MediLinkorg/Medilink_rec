@@ -1,0 +1,8 @@
+services:
+  autorec:
+    build: .
+    image: medilink-autorec:latest
+    env_file: .env
+    ports:
+      - "8003:8003"
+    restart: unless-stopped
