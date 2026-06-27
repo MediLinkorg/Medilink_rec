@@ -1,8 +1,23 @@
 services:
   autorec:
-    build: .
-    image: medilink-autorec:latest
-    env_file: .env
+    image: ${DOCKERHUB_USERNAME}/medilink-autorec:${IMAGE_TAG:-latest}
+    environment:
+      # Non-secrets — hardcoded
+      CLAUDE_MODEL: claude-haiku-4-5-20251001
+      DATABASE_PATH: /srv/app/autorec_service/data/vezeeta_alexandria_autorec.sqlite
+      ACCOUNTS_PATH: /srv/app/veez_autorec_agent/data/vezeeta_accounts.json
+      AUTOREC_WEIGHT: "0.35"
+      COLD_START_WEIGHT: "0.65"
+      CORS_ALLOW_ORIGINS: "*"
+      LOG_LEVEL: INFO
+      # Secrets — injected at runtime from shell environment (set by GitHub Actions)
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
     ports:
       - "8003:8003"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
     restart: unless-stopped
