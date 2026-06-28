@@ -1,6 +1,4 @@
 from __future__ import annotations
-from app.veez_autorec_agent.vezeeta_live_booking import get_live_availability, book_selected_slot
-from app.veez_autorec_agent.booking_automation import BookingRequest, book_on_vezeeta
 from typing import Optional
 
 from fastapi import FastAPI
@@ -42,17 +40,6 @@ class InteractionRequest(BaseModel):
     source: str = "api"
 
 
-
-class BookingStartRequest(BaseModel):
-    doctor_url: str
-    patient_name: str
-    patient_phone: str
-    preferred_day_text: str | None = None
-    preferred_time_text: str | None = None
-    dry_run: bool = True
-    user_confirmed_final: bool = False
-
-
 class TrainRequest(BaseModel):
     include_synthetic: bool = True
     hidden_dim: int = 64
@@ -84,59 +71,3 @@ def interaction(req: InteractionRequest):
 def train(req: TrainRequest):
     return train_autorec(**req.model_dump())
 
-
-
-@app.post("/booking/start")
-def booking_start(req: BookingStartRequest):
-    booking_req = BookingRequest(
-        doctor_url=req.doctor_url,
-        patient_name=req.patient_name,
-        patient_phone=req.patient_phone,
-        preferred_day_text=req.preferred_day_text,
-        preferred_time_text=req.preferred_time_text,
-        dry_run=req.dry_run,
-        user_confirmed_final=req.user_confirmed_final,
-    )
-    return book_on_vezeeta(booking_req)
-
-
-class BookingAvailabilityRequest(BaseModel):
-    user_id: str
-    doctor_url: str
-    headless: bool = False
-
-
-class BookingConfirmRequest(BaseModel):
-    user_id: str
-    doctor_url: str
-    selected_time_text: str
-    patient_name: str
-    patient_phone: str
-    doctor_cache_id: int | None = None
-    dry_run: bool = True
-    user_confirmed_final: bool = False
-    headless: bool = False
-
-
-@app.post("/booking/availability")
-def booking_availability(req: BookingAvailabilityRequest):
-    return get_live_availability(
-        user_id=req.user_id,
-        doctor_url=req.doctor_url,
-        headless=req.headless,
-    )
-
-
-@app.post("/booking/confirm")
-def booking_confirm(req: BookingConfirmRequest):
-    return book_selected_slot(
-        user_id=req.user_id,
-        doctor_url=req.doctor_url,
-        selected_time_text=req.selected_time_text,
-        patient_name=req.patient_name,
-        patient_phone=req.patient_phone,
-        doctor_cache_id=req.doctor_cache_id,
-        dry_run=req.dry_run,
-        user_confirmed_final=req.user_confirmed_final,
-        headless=req.headless,
-    )
