@@ -1,5 +1,5 @@
-# MediLink AutoRec service — Playwright base (needs browser for Vezeeta booking).
-FROM mcr.microsoft.com/playwright/python:v1.45.0-jammy
+# MediLink AutoRec service
+FROM python:3.10-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -12,7 +12,6 @@ WORKDIR /srv
 
 COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
-RUN playwright install chromium
 
 COPY app ./app
 
